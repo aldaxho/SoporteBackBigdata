@@ -8,15 +8,17 @@ dotenv.config();
 const app = express();
 const allowedOrigins = [
   'http://localhost:3000',  // tu entorno local
-  'https://tudominio.vercel.app', // <-- cuando subas la web a Vercel
+  'https://tudominio.vercel.app', // cuando subas la web a Vercel
+  'https://api-dispositivos-production.up.railway.app', // Railway API
 ];
 app.use(
   cors({
     origin: function (origin, callback) {
+      // Permitir peticiones sin origin (como Postman, curl, etc.)
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error('CORS no permitido'));
+        callback(new Error('CORS no permitido para origen: ' + origin));
       }
     },
     credentials: true,
