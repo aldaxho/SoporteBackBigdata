@@ -52,6 +52,18 @@ app.post("/registrar", async (req, res) => {
     res.status(500).json({ error: "Error al registrar datos" });
   }
 });
+//obtener todos los registros
+app.get("/registros", async (req, res) => {
+    try{
+        const {rows} = await pool.query(
+            `SELECT * FROM dispositivo_log ORDER BY fecha_hora DESC;`
+        );
+        res.json(rows);
+    } catch (err) {
+        res.status(500).json({ error: "Error al obtener datos" });
+    }
+});
+
 //obtenere utimos datos por dispositivo
 app.get("/dispositivos/:id", async (req, res) => {
     try{
@@ -67,6 +79,32 @@ app.get("/dispositivos/:id", async (req, res) => {
         res.status(500).json({ error: "Error al obtener datos" });
     }
 });
+//consultas query
+app.post("/consultar-sql", async (req, res) => {
+  try {
+    const { query } = req.body;
+
+    if (!query || typeof query !== "string") {
+      return res.status(400).json({ error: "Debe enviar una consulta SQL válida" });
+    }
+
+    /*// Seguridad básica: solo permitir SELECT
+    const sql = query.trim().toLowerCase();
+    if (!sql.startsWith("select")) {
+      return res.status(400).json({ error: "Solo se permiten consultas SELECT" });
+    }*/
+
+    
+    const { rows } = await pool.query(query);
+    res.json({ resultados: rows });
+
+  } catch (err) {
+    console.error("Error ejecutando consulta:", err);
+    res.status(500).json({ error: "Error ejecutando la consulta" });
+  }
+});
+
+
 
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
