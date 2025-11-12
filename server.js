@@ -6,7 +6,22 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
-app.use(cors());
+const allowedOrigins = [
+  'http://localhost:3000',  // tu entorno local
+  'https://tudominio.vercel.app', // <-- cuando subas la web a Vercel
+];
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('CORS no permitido'));
+      }
+    },
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 const PORT = process.env.PORT;
